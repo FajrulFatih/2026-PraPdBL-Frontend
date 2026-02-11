@@ -25,6 +25,7 @@ export default function Sidebar() {
           { to: '/dashboard', label: 'Dashboard' },
           { to: '/rooms', label: 'Rooms' },
           { to: '/bookings', label: 'Bookings' },
+          { to: '/booking-history', label: 'Booking History' },
         ].map((item) => (
           <ListItemButton
             key={item.to}

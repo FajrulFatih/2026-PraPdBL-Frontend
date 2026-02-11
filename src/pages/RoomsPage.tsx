@@ -1,6 +1,7 @@
 import {
     Alert,
     Button,
+    Chip,
     Paper,
     Stack,
     Table,
@@ -17,6 +18,14 @@ import PageWrapper from '../components/layout/PageWrapper'
 import RoomCreateDialog from '../components/common/RoomCreateDialog'
 import RoomEditDialog from '../components/common/RoomEditDialog'
 import useRooms from '../hooks/useRooms'
+
+function getStatusChipProps(status: string | null | undefined) {
+    const label = status ?? 'N/A'
+    if (label === 'Approved') return { color: 'success' as const, variant: 'filled' as const, label }
+    if (label === 'Rejected') return { color: 'error' as const, variant: 'filled' as const, label }
+    if (label === 'Pending') return { color: 'warning' as const, variant: 'filled' as const, label }
+    return { color: 'default' as const, variant: 'outlined' as const, label }
+}
 
 export default function RoomsPage() {
     const {
@@ -71,7 +80,9 @@ export default function RoomsPage() {
                                 <TableCell>{room.capacity}</TableCell>
                                 <TableCell>{room.location}</TableCell>
                                 <TableCell>{room.isActive ? 'Yes' : 'No'}</TableCell>
-                                <TableCell>{room.bookingStatus ?? 'N/A'}</TableCell>
+                                <TableCell>
+                                    <Chip size="small" {...getStatusChipProps(room.bookingStatus)} />
+                                </TableCell>
                                 <TableCell align="right">
                                     <Button
                                         size="small"
