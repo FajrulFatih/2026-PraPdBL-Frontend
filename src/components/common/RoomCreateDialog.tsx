@@ -9,23 +9,8 @@ import {
     Switch,
     TextField,
 } from '@mui/material'
-import type { ChangeEvent, FormEvent } from 'react'
-
-export type RoomCreateForm = {
-    roomCode: string
-    roomName: string
-    capacity: number
-    location: string
-    isActive: boolean
-}
-
-type RoomCreateDialogProps = {
-    open: boolean
-    value: RoomCreateForm
-    onClose: () => void
-    onSubmit: (event: FormEvent<HTMLFormElement>) => void
-    onChange: (next: RoomCreateForm) => void
-}
+import type { ChangeEvent } from 'react'
+import type { RoomCreateDialogProps, RoomCreateForm } from '../../types/room'
 
 export default function RoomCreateDialog({ open, value, onClose, onSubmit, onChange }: RoomCreateDialogProps) {
     const updateField = (field: keyof RoomCreateForm, nextValue: string | number | boolean) => {

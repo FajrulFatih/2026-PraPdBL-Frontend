@@ -12,22 +12,9 @@ import {
     TableRow,
     Typography,
 } from '@mui/material'
-import type { BookingListItem } from '../../types/booking'
+import type { BookingTableProps } from '../../types/booking'
 import { formatBookingRange } from '../../utils/formatBookingRange'
-
-const statusOptions = [
-    { id: 1, label: 'Pending' },
-    { id: 2, label: 'Approved' },
-    { id: 3, label: 'Rejected' },
-]
-
-type BookingTableProps = {
-    items: BookingListItem[]
-    onEdit: (item: BookingListItem) => void
-    onDelete: (id: number) => void
-    onStatusChange: (id: number, statusId: number) => void
-    isLoading: boolean
-}
+import { bookingStatusOptions, getBookingRoomLabel, getBookingUserLabel } from '../../utils/bookingList'
 
 export default function BookingTable({ items, onEdit, onDelete, onStatusChange, isLoading }: BookingTableProps) {
     return (
@@ -50,8 +37,8 @@ export default function BookingTable({ items, onEdit, onDelete, onStatusChange, 
                             <TableCell>#{item.id}</TableCell>
                             <TableCell>{item.purpose}</TableCell>
                             <TableCell>{formatBookingRange(item.startTime, item.endTime)}</TableCell>
-                            <TableCell>{item.roomId}</TableCell>
-                            <TableCell>{item.userId}</TableCell>
+                            <TableCell>{getBookingRoomLabel(item)}</TableCell>
+                            <TableCell>{getBookingUserLabel(item)}</TableCell>
                             <TableCell>
                                 <Select
                                     size="small"
@@ -59,7 +46,7 @@ export default function BookingTable({ items, onEdit, onDelete, onStatusChange, 
                                     onChange={(event) => onStatusChange(item.id, Number(event.target.value))}
                                     disabled={isLoading}
                                 >
-                                    {statusOptions.map((status) => (
+                                    {bookingStatusOptions.map((status) => (
                                         <MenuItem key={status.id} value={status.id}>
                                             {status.label}
                                         </MenuItem>

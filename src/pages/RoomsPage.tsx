@@ -15,8 +15,10 @@ import {
 import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'
 import PageWrapper from '../components/layout/PageWrapper'
-import RoomCreateDialog, { type RoomCreateForm } from '../components/common/RoomCreateDialog'
+import RoomCreateDialog from '../components/common/RoomCreateDialog'
 import useRooms from '../hooks/useRooms'
+import { createRoom } from '../services/roomService'
+import type { RoomCreateForm } from '../types/room'
 
 const emptyCreateForm: RoomCreateForm = {
     roomCode: '',
@@ -31,23 +33,37 @@ export default function RoomsPage() {
     const { items, error, isLoading, page, pageSize, total, setPage, setPageSize, refresh } = useRooms()
     const [isCreateOpen, setIsCreateOpen] = useState(false)
     const [createForm, setCreateForm] = useState(emptyCreateForm)
+    const [createError, setCreateError] = useState<string | null>(null)
+    const [isCreating, setIsCreating] = useState(false)
 
     const openCreate = () => setIsCreateOpen(true)
     const closeCreate = () => {
         setIsCreateOpen(false)
         setCreateForm(emptyCreateForm)
+        setCreateError(null)
     }
 
-    const submitCreate = (event: FormEvent<HTMLFormElement>) => {
+    const submitCreate = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
-        closeCreate()
+        try {
+            setCreateError(null)
+            setIsCreating(true)
+            await createRoom(createForm)
+            await refresh()
+            closeCreate()
+        } catch (err: unknown) {
+            setCreateError(err instanceof Error ? err.message : 'Unknown error')
+        } finally {
+            setIsCreating(false)
+        }
     }
 
     return (
         <PageWrapper title="Rooms">
             {error ? <Alert severity="error">{error}</Alert> : null}
+            {createError ? <Alert severity="error">{createError}</Alert> : null}
             <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-                <Button variant="contained" onClick={openCreate}>
+                <Button variant="contained" onClick={openCreate} disabled={isCreating}>
                     Create Room
                 </Button>
                 <Button variant="outlined" onClick={refresh} disabled={isLoading}>

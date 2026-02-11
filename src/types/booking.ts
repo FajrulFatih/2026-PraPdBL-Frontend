@@ -1,3 +1,5 @@
+import type { FormEvent } from 'react'
+
 export type BookingListItem = {
     id: number
     purpose: string
@@ -6,6 +8,13 @@ export type BookingListItem = {
     statusId: number
     roomId: number
     userId: number
+    room?: {
+        roomCode: string
+        roomName: string
+    } | null
+    user?: {
+        name: string
+    } | null
 }
 
 export type BookingListResponse = {
@@ -22,4 +31,28 @@ export type BookingCreateDto = {
     purpose: string
     startTime: string
     endTime: string
+}
+
+export type BookingFormOption = {
+    id: number
+    label: string
+}
+
+export type BookingFormProps = {
+    value: BookingCreateDto
+    isEditing: boolean
+    isLoading: boolean
+    onChange: (value: BookingCreateDto) => void
+    onSubmit: (event: FormEvent<HTMLFormElement>) => void
+    onCancel: () => void
+    roomOptions?: BookingFormOption[]
+    userOptions?: BookingFormOption[]
+}
+
+export type BookingTableProps = {
+    items: BookingListItem[]
+    onEdit: (item: BookingListItem) => void
+    onDelete: (id: number) => void
+    onStatusChange: (id: number, statusId: number) => void
+    isLoading: boolean
 }

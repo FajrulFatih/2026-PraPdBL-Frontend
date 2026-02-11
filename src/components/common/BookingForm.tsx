@@ -1,20 +1,19 @@
-import type { FormEvent } from 'react'
-import { Box, Button, Grid, Stack, TextField } from '@mui/material'
+import { Box, Button, Grid, Stack, TextField, MenuItem } from '@mui/material'
 import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import type { BookingCreateDto } from '../../types/booking'
+import type { BookingFormProps } from '../../types/booking'
 import { useBookingFormValidation } from '../../hooks/useBookingFormValidation'
 
-type BookingFormProps = {
-    value: BookingCreateDto
-    isEditing: boolean
-    isLoading: boolean
-    onChange: (value: BookingCreateDto) => void
-    onSubmit: (event: FormEvent<HTMLFormElement>) => void
-    onCancel: () => void
-}
-
-export default function BookingForm({ value, isEditing, isLoading, onChange, onSubmit, onCancel }: BookingFormProps) {
+export default function BookingForm({
+    value,
+    isEditing,
+    isLoading,
+    onChange,
+    onSubmit,
+    onCancel,
+    roomOptions = [],
+    userOptions = [],
+}: BookingFormProps) {
     const { errors, handleSubmit, toPickerValue, toPayloadValue } = useBookingFormValidation(value, onSubmit)
 
     return (
@@ -71,33 +70,43 @@ export default function BookingForm({ value, isEditing, isLoading, onChange, onS
                     </Grid>
                     <Grid size={{ xs: 12, md: 6, lg: 3 }}>
                         <TextField
-                            label="Room ID"
-                            type="number"
+                            label="Room"
+                            select
                             value={value.roomId}
                             onChange={(event) => onChange({ ...value, roomId: Number(event.target.value) })}
                             size="small"
                             required
                             disabled={isLoading}
-                            inputProps={{ min: 1 }}
                             error={Boolean(errors.roomId)}
                             helperText={errors.roomId ?? undefined}
                             fullWidth
-                        />
+                        >
+                            {roomOptions.map((option) => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid size={{ xs: 12, md: 6, lg: 3 }}>
                         <TextField
-                            label="User ID"
-                            type="number"
+                            label="User"
+                            select
                             value={value.userId}
                             onChange={(event) => onChange({ ...value, userId: Number(event.target.value) })}
                             size="small"
                             required
                             disabled={isLoading}
-                            inputProps={{ min: 1 }}
                             error={Boolean(errors.userId)}
                             helperText={errors.userId ?? undefined}
                             fullWidth
-                        />
+                        >
+                            {userOptions.map((option) => (
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid size={{ xs: 12 }}>
                         <Stack direction="row" spacing={1}>

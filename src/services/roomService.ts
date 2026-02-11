@@ -1,4 +1,4 @@
-import type { RoomListResponse } from '../types/room'
+import type { RoomCreateForm, RoomListItem, RoomListResponse } from '../types/room'
 
 const baseUrl = import.meta.env.VITE_API_URL
 
@@ -19,4 +19,20 @@ export async function getRooms(page = 1, pageSize = 10) {
         throw new Error(`Request failed: ${res.status}`)
     }
     return (await res.json()) as RoomListResponse
+}
+
+export async function createRoom(dto: RoomCreateForm) {
+    ensureBaseUrl()
+    const url = new URL('/api/rooms', baseUrl)
+
+    const res = await fetch(url.toString(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto),
+    })
+
+    if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`)
+    }
+    return (await res.json()) as RoomListItem
 }
