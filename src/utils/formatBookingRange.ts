@@ -1,8 +1,8 @@
-import dayjs from 'dayjs'
+import { toWibFromString } from './timeZone'
 
 export function formatBookingRange(start: string, end: string) {
-    const startDate = dayjs(start)
-    const endDate = dayjs(end)
+    const startDate = toWibFromString(start)
+    const endDate = toWibFromString(end)
 
     if (!startDate.isValid() || !endDate.isValid()) {
         return `${start} - ${end}`
