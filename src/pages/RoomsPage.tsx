@@ -12,101 +12,35 @@ import {
     TableRow,
     Typography,
 } from '@mui/material'
-import type { ChangeEvent, FormEvent } from 'react'
-import { useState } from 'react'
+import type { ChangeEvent } from 'react'
 import PageWrapper from '../components/layout/PageWrapper'
 import RoomCreateDialog from '../components/common/RoomCreateDialog'
 import RoomEditDialog from '../components/common/RoomEditDialog'
 import useRooms from '../hooks/useRooms'
-import { createRoom, updateRoom } from '../services/roomService'
-import type { RoomCreateForm, RoomListItem } from '../types/room'
-
-const emptyCreateForm: RoomCreateForm = {
-    roomCode: '',
-    roomName: '',
-    capacity: 1,
-    location: '',
-    isActive: true,
-}
-
 
 export default function RoomsPage() {
-    const { items, error, isLoading, page, pageSize, total, setPage, setPageSize, refresh } = useRooms()
-    const [isCreateOpen, setIsCreateOpen] = useState(false)
-    const [createForm, setCreateForm] = useState(emptyCreateForm)
-    const [createError, setCreateError] = useState<string | null>(null)
-    const [isCreating, setIsCreating] = useState(false)
-    const [isEditOpen, setIsEditOpen] = useState(false)
-    const [editForm, setEditForm] = useState(emptyCreateForm)
-    const [editId, setEditId] = useState<number | null>(null)
-    const [editError, setEditError] = useState<string | null>(null)
-    const [isUpdating, setIsUpdating] = useState(false)
-
-    const openCreate = () => setIsCreateOpen(true)
-    const closeCreate = () => {
-        setIsCreateOpen(false)
-        setCreateForm(emptyCreateForm)
-        setCreateError(null)
-    }
-
-    const openEdit = (room: RoomListItem) => {
-        setEditId(room.id)
-        setEditForm({
-            roomCode: room.roomCode,
-            roomName: room.roomName,
-            capacity: room.capacity,
-            location: room.location,
-            isActive: room.isActive,
-        })
-        setIsEditOpen(true)
-    }
-
-    const closeEdit = () => {
-        setIsEditOpen(false)
-        setEditId(null)
-        setEditForm(emptyCreateForm)
-        setEditError(null)
-    }
-
-    const submitCreate = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        try {
-            setCreateError(null)
-            setIsCreating(true)
-            await createRoom(createForm)
-            await refresh()
-            closeCreate()
-        } catch (err: unknown) {
-            setCreateError(err instanceof Error ? err.message : 'Unknown error')
-        } finally {
-            setIsCreating(false)
-        }
-    }
-
-    const submitEdit = async (event: FormEvent<HTMLFormElement>) => {
-        event.preventDefault()
-        if (editId === null) return
-
-        try {
-            setEditError(null)
-            setIsUpdating(true)
-            await updateRoom(editId, editForm)
-            await refresh()
-            closeEdit()
-        } catch (err: unknown) {
-            setEditError(err instanceof Error ? err.message : 'Unknown error')
-        } finally {
-            setIsUpdating(false)
-        }
-    }
+    const {
+        items,
+        error,
+        isLoading,
+        page,
+        pageSize,
+        total,
+        setPage,
+        setPageSize,
+        refresh,
+        createDialog,
+        editDialog,
+        isBusy,
+    } = useRooms()
 
     return (
         <PageWrapper title="Rooms">
             {error ? <Alert severity="error">{error}</Alert> : null}
-            {createError ? <Alert severity="error">{createError}</Alert> : null}
-            {editError ? <Alert severity="error">{editError}</Alert> : null}
+            {createDialog.error ? <Alert severity="error">{createDialog.error}</Alert> : null}
+            {editDialog.error ? <Alert severity="error">{editDialog.error}</Alert> : null}
             <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-                <Button variant="contained" onClick={openCreate} disabled={isCreating || isUpdating}>
+                <Button variant="contained" onClick={createDialog.openDialog} disabled={isBusy}>
                     Create Room
                 </Button>
                 <Button variant="outlined" onClick={refresh} disabled={isLoading}>
@@ -142,8 +76,8 @@ export default function RoomsPage() {
                                     <Button
                                         size="small"
                                         variant="outlined"
-                                        onClick={() => openEdit(room)}
-                                        disabled={isUpdating || isCreating}
+                                        onClick={() => editDialog.openDialog(room)}
+                                        disabled={isBusy}
                                     >
                                         Edit
                                     </Button>
@@ -176,19 +110,19 @@ export default function RoomsPage() {
             </TableContainer>
 
             <RoomCreateDialog
-                open={isCreateOpen}
-                value={createForm}
-                onClose={closeCreate}
-                onChange={setCreateForm}
-                onSubmit={submitCreate}
+                open={createDialog.open}
+                value={createDialog.form}
+                onClose={createDialog.closeDialog}
+                onChange={createDialog.setForm}
+                onSubmit={createDialog.submit}
             />
 
             <RoomEditDialog
-                open={isEditOpen}
-                value={editForm}
-                onClose={closeEdit}
-                onChange={setEditForm}
-                onSubmit={submitEdit}
+                open={editDialog.open}
+                value={editDialog.form}
+                onClose={editDialog.closeDialog}
+                onChange={editDialog.setForm}
+                onSubmit={editDialog.submit}
             />
         </PageWrapper>
     )
