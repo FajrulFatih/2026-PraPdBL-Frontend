@@ -1,4 +1,5 @@
 import type { BookingCreateDto, BookingListItem, BookingListResponse } from '../types/booking'
+import type { BookingHistoryItem } from '../types/bookingHistory'
 
 const baseUrl = import.meta.env.VITE_API_URL
 
@@ -89,4 +90,15 @@ export async function updateBookingStatus(id: number, statusId: number, changedB
         throw new Error(`Request failed: ${res.status}`)
     }
     return (await res.json()) as BookingListItem
+}
+
+export async function getBookingHistory() {
+    ensureBaseUrl()
+    const url = new URL('/api/bookings/history', baseUrl)
+
+    const res = await fetch(url.toString())
+    if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`)
+    }
+    return (await res.json()) as BookingHistoryItem[]
 }

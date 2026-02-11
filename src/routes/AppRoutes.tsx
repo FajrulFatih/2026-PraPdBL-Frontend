@@ -7,6 +7,7 @@ import { LayoutProvider } from '../context/layoutContext'
 import DashboardPage from '../pages/DashboardPage'
 import RoomsPage from '../pages/RoomsPage'
 import BookingsPage from '../pages/BookingsPage'
+import BookingHistoryPage from '../pages/BookingHistoryPage'
 
 function AppLayout() {
     return (
@@ -35,6 +36,7 @@ export default function AppRoutes() {
                         <Route path="/dashboard" element={<DashboardPage />} />
                         <Route path="/rooms" element={<RoomsPage />} />
                         <Route path="/bookings" element={<BookingsPage />} />
+                        <Route path="/booking-history" element={<BookingHistoryPage />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
