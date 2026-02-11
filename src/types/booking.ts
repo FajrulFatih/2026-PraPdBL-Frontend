@@ -16,6 +16,7 @@ export type BookingListResponse = {
 }
 
 export type BookingCreateDto = {
+    bookingId?: number
     roomId: number
     userId: number
     purpose: string

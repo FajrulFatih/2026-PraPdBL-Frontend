@@ -51,11 +51,12 @@ export async function createBooking(dto: BookingCreateDto) {
 export async function updateBooking(id: number, dto: BookingCreateDto) {
     ensureBaseUrl()
     const url = new URL(`/api/bookings/${id}`, baseUrl)
+    const payload: BookingCreateDto = { ...dto, bookingId: id }
 
     const res = await fetch(url.toString(), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dto),
+        body: JSON.stringify(payload),
     })
 
     if (!res.ok) {
