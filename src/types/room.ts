@@ -32,3 +32,11 @@ export type RoomCreateDialogProps = {
     onSubmit: (event: FormEvent<HTMLFormElement>) => void
     onChange: (next: RoomCreateForm) => void
 }
+
+export type RoomEditDialogProps = {
+    open: boolean
+    value: RoomCreateForm
+    onClose: () => void
+    onSubmit: (event: FormEvent<HTMLFormElement>) => void
+    onChange: (next: RoomCreateForm) => void
+}

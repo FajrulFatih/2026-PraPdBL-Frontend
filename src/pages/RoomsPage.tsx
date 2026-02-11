@@ -16,9 +16,10 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { useState } from 'react'
 import PageWrapper from '../components/layout/PageWrapper'
 import RoomCreateDialog from '../components/common/RoomCreateDialog'
+import RoomEditDialog from '../components/common/RoomEditDialog'
 import useRooms from '../hooks/useRooms'
-import { createRoom } from '../services/roomService'
-import type { RoomCreateForm } from '../types/room'
+import { createRoom, updateRoom } from '../services/roomService'
+import type { RoomCreateForm, RoomListItem } from '../types/room'
 
 const emptyCreateForm: RoomCreateForm = {
     roomCode: '',
@@ -35,12 +36,36 @@ export default function RoomsPage() {
     const [createForm, setCreateForm] = useState(emptyCreateForm)
     const [createError, setCreateError] = useState<string | null>(null)
     const [isCreating, setIsCreating] = useState(false)
+    const [isEditOpen, setIsEditOpen] = useState(false)
+    const [editForm, setEditForm] = useState(emptyCreateForm)
+    const [editId, setEditId] = useState<number | null>(null)
+    const [editError, setEditError] = useState<string | null>(null)
+    const [isUpdating, setIsUpdating] = useState(false)
 
     const openCreate = () => setIsCreateOpen(true)
     const closeCreate = () => {
         setIsCreateOpen(false)
         setCreateForm(emptyCreateForm)
         setCreateError(null)
+    }
+
+    const openEdit = (room: RoomListItem) => {
+        setEditId(room.id)
+        setEditForm({
+            roomCode: room.roomCode,
+            roomName: room.roomName,
+            capacity: room.capacity,
+            location: room.location,
+            isActive: room.isActive,
+        })
+        setIsEditOpen(true)
+    }
+
+    const closeEdit = () => {
+        setIsEditOpen(false)
+        setEditId(null)
+        setEditForm(emptyCreateForm)
+        setEditError(null)
     }
 
     const submitCreate = async (event: FormEvent<HTMLFormElement>) => {
@@ -58,12 +83,30 @@ export default function RoomsPage() {
         }
     }
 
+    const submitEdit = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        if (editId === null) return
+
+        try {
+            setEditError(null)
+            setIsUpdating(true)
+            await updateRoom(editId, editForm)
+            await refresh()
+            closeEdit()
+        } catch (err: unknown) {
+            setEditError(err instanceof Error ? err.message : 'Unknown error')
+        } finally {
+            setIsUpdating(false)
+        }
+    }
+
     return (
         <PageWrapper title="Rooms">
             {error ? <Alert severity="error">{error}</Alert> : null}
             {createError ? <Alert severity="error">{createError}</Alert> : null}
+            {editError ? <Alert severity="error">{editError}</Alert> : null}
             <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-                <Button variant="contained" onClick={openCreate} disabled={isCreating}>
+                <Button variant="contained" onClick={openCreate} disabled={isCreating || isUpdating}>
                     Create Room
                 </Button>
                 <Button variant="outlined" onClick={refresh} disabled={isLoading}>
@@ -82,6 +125,7 @@ export default function RoomsPage() {
                             <TableCell>Location</TableCell>
                             <TableCell>Active</TableCell>
                             <TableCell>Booking Status</TableCell>
+                            <TableCell align="right">Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -94,11 +138,21 @@ export default function RoomsPage() {
                                 <TableCell>{room.location}</TableCell>
                                 <TableCell>{room.isActive ? 'Yes' : 'No'}</TableCell>
                                 <TableCell>{room.bookingStatus ?? 'N/A'}</TableCell>
+                                <TableCell align="right">
+                                    <Button
+                                        size="small"
+                                        variant="outlined"
+                                        onClick={() => openEdit(room)}
+                                        disabled={isUpdating || isCreating}
+                                    >
+                                        Edit
+                                    </Button>
+                                </TableCell>
                             </TableRow>
                         ))}
                         {items.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} align="center">
+                                <TableCell colSpan={8} align="center">
                                     <Typography variant="body2" color="text.secondary">
                                         {isLoading ? 'Loading...' : 'No data'}
                                     </Typography>
@@ -127,6 +181,14 @@ export default function RoomsPage() {
                 onClose={closeCreate}
                 onChange={setCreateForm}
                 onSubmit={submitCreate}
+            />
+
+            <RoomEditDialog
+                open={isEditOpen}
+                value={editForm}
+                onClose={closeEdit}
+                onChange={setEditForm}
+                onSubmit={submitEdit}
             />
         </PageWrapper>
     )

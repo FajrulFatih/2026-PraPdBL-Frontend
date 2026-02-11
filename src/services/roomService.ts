@@ -36,3 +36,19 @@ export async function createRoom(dto: RoomCreateForm) {
     }
     return (await res.json()) as RoomListItem
 }
+
+export async function updateRoom(id: number, dto: RoomCreateForm) {
+    ensureBaseUrl()
+    const url = new URL(`/api/rooms/${id}`, baseUrl)
+
+    const res = await fetch(url.toString(), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto),
+    })
+
+    if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`)
+    }
+    return (await res.json()) as RoomListItem
+}
