@@ -73,3 +73,19 @@ export async function deleteBooking(id: number) {
         throw new Error(`Request failed: ${res.status}`)
     }
 }
+
+export async function updateBookingStatus(id: number, statusId: number, changedBy: number, note?: string) {
+    ensureBaseUrl()
+    const url = new URL(`/api/bookings/${id}/status`, baseUrl)
+
+    const res = await fetch(url.toString(), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statusId, changedBy, note }),
+    })
+
+    if (!res.ok) {
+        throw new Error(`Request failed: ${res.status}`)
+    }
+    return (await res.json()) as BookingListItem
+}

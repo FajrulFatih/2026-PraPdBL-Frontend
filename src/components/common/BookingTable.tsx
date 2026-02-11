@@ -1,6 +1,8 @@
 import {
     Button,
+    MenuItem,
     Paper,
+    Select,
     Stack,
     Table,
     TableBody,
@@ -13,14 +15,21 @@ import {
 import type { BookingListItem } from '../../types/booking'
 import { formatBookingRange } from '../../utils/formatBookingRange'
 
+const statusOptions = [
+    { id: 1, label: 'Pending' },
+    { id: 2, label: 'Approved' },
+    { id: 3, label: 'Rejected' },
+]
+
 type BookingTableProps = {
     items: BookingListItem[]
     onEdit: (item: BookingListItem) => void
     onDelete: (id: number) => void
+    onStatusChange: (id: number, statusId: number) => void
     isLoading: boolean
 }
 
-export default function BookingTable({ items, onEdit, onDelete, isLoading }: BookingTableProps) {
+export default function BookingTable({ items, onEdit, onDelete, onStatusChange, isLoading }: BookingTableProps) {
     return (
         <TableContainer component={Paper} elevation={0}>
             <Table size="small">
@@ -31,6 +40,7 @@ export default function BookingTable({ items, onEdit, onDelete, isLoading }: Boo
                         <TableCell>Time</TableCell>
                         <TableCell>Room</TableCell>
                         <TableCell>User</TableCell>
+                        <TableCell>Status</TableCell>
                         <TableCell align="right">Action</TableCell>
                     </TableRow>
                 </TableHead>
@@ -42,6 +52,20 @@ export default function BookingTable({ items, onEdit, onDelete, isLoading }: Boo
                             <TableCell>{formatBookingRange(item.startTime, item.endTime)}</TableCell>
                             <TableCell>{item.roomId}</TableCell>
                             <TableCell>{item.userId}</TableCell>
+                            <TableCell>
+                                <Select
+                                    size="small"
+                                    value={item.statusId}
+                                    onChange={(event) => onStatusChange(item.id, Number(event.target.value))}
+                                    disabled={isLoading}
+                                >
+                                    {statusOptions.map((status) => (
+                                        <MenuItem key={status.id} value={status.id}>
+                                            {status.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </TableCell>
                             <TableCell align="right">
                                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                                     <Button
@@ -67,7 +91,7 @@ export default function BookingTable({ items, onEdit, onDelete, isLoading }: Boo
                     ))}
                     {items.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} align="center">
+                            <TableCell colSpan={7} align="center">
                                 <Typography variant="body2" color="text.secondary">
                                     {isLoading ? 'Loading...' : 'No data'}
                                 </Typography>

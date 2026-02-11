@@ -5,7 +5,8 @@ import BookingTable from '../components/common/BookingTable'
 import useBookings from '../hooks/useBookings'
 
 export default function BookingsPage() {
-    const { items, error, isLoading, form, editId, setForm, onSubmit, onEdit, onDelete, onCancel } = useBookings()
+    const { items, error, isLoading, form, editId, setForm, onSubmit, onEdit, onDelete, onStatusChange, onCancel } =
+        useBookings()
 
     return (
         <PageWrapper title="Bookings">
@@ -21,7 +22,13 @@ export default function BookingsPage() {
                     onCancel={onCancel}
                 />
 
-                <BookingTable items={items} isLoading={isLoading} onEdit={onEdit} onDelete={onDelete} />
+                <BookingTable
+                    items={items}
+                    isLoading={isLoading}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    onStatusChange={onStatusChange}
+                />
             </Stack>
         </PageWrapper>
     )

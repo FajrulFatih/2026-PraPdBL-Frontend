@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState } from 'react'
-import { createBooking, deleteBooking, getBookings, updateBooking } from '../services/bookingService'
+import { createBooking, deleteBooking, getBookings, updateBooking, updateBookingStatus } from '../services/bookingService'
 import type { BookingCreateDto, BookingListItem } from '../types/booking'
 import { emptyBookingForm, toBookingForm } from '../utils/getBookingFormErrors'
 
@@ -65,6 +65,19 @@ export default function useBookings() {
         }
     }
 
+    const onStatusChange = async (id: number, statusId: number) => {
+        try {
+            setError(null)
+            setIsLoading(true)
+            await updateBookingStatus(id, statusId, 1)
+            await refresh()
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unknown error')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     const onCancel = () => {
         setEditId(null)
         setForm(emptyBookingForm)
@@ -80,6 +93,7 @@ export default function useBookings() {
         onSubmit,
         onEdit,
         onDelete,
+        onStatusChange,
         onCancel,
     }
 }
