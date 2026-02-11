@@ -1,3 +1,5 @@
+import { Stack, Typography } from '@mui/material'
+
 export default function PageWrapper({
   title,
   children,
@@ -6,9 +8,11 @@ export default function PageWrapper({
   children: React.ReactNode
 }) {
   return (
-    <section className="page-wrapper">
-      <h1>{title}</h1>
+    <Stack component="section" spacing={2}>
+      <Typography variant="h5" sx={{ fontWeight: 700 }}>
+        {title}
+      </Typography>
       {children}
-    </section>
+    </Stack>
   )
 }
