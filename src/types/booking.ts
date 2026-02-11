@@ -53,6 +53,12 @@ export type BookingTableProps = {
     items: BookingListItem[]
     onEdit: (item: BookingListItem) => void
     onDelete: (id: number) => void
-    onStatusChange: (id: number, statusId: number) => void
+    onStatusSelect: (id: number, statusId: number) => void
+    onStatusConfirm: () => void
+    onStatusDialogClose: () => void
+    note: string
+    onNoteChange: (value: string) => void
+    pendingId: number | null
+    pendingStatusId: number | null
     isLoading: boolean
 }

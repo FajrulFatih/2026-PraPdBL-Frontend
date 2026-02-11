@@ -10,6 +10,9 @@ export default function useBookings() {
     const [isLoading, setIsLoading] = useState(false)
     const [form, setForm] = useState<BookingCreateDto>(emptyBookingForm)
     const [editId, setEditId] = useState<number | null>(null)
+    const [note, setNote] = useState('')
+    const [pendingId, setPendingId] = useState<number | null>(null)
+    const [pendingStatusId, setPendingStatusId] = useState<number | null>(null)
 
     const refresh = async () => {
         setIsLoading(true)
@@ -65,17 +68,34 @@ export default function useBookings() {
         }
     }
 
-    const onStatusChange = async (id: number, statusId: number) => {
+    const onStatusChange = async (id: number, statusId: number, noteValue?: string) => {
         try {
             setError(null)
             setIsLoading(true)
-            await updateBookingStatus(id, statusId, 1)
+            await updateBookingStatus(id, statusId, 1, noteValue)
             await refresh()
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'Unknown error')
         } finally {
             setIsLoading(false)
         }
+    }
+
+    const onStatusSelect = (id: number, statusId: number) => {
+        setPendingId(id)
+        setPendingStatusId(statusId)
+    }
+
+    const onStatusDialogClose = () => {
+        setPendingId(null)
+        setPendingStatusId(null)
+        setNote('')
+    }
+
+    const onStatusConfirm = () => {
+        if (pendingId == null || pendingStatusId == null) return
+        onStatusChange(pendingId, pendingStatusId, note.trim() || undefined)
+        onStatusDialogClose()
     }
 
     const onCancel = () => {
@@ -93,7 +113,13 @@ export default function useBookings() {
         onSubmit,
         onEdit,
         onDelete,
-        onStatusChange,
+        onStatusSelect,
+        onStatusConfirm,
+        onStatusDialogClose,
+        note,
+        setNote,
+        pendingId,
+        pendingStatusId,
         onCancel,
     }
 }

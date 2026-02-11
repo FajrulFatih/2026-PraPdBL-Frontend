@@ -1,5 +1,9 @@
 import {
     Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     MenuItem,
     Paper,
     Select,
@@ -10,16 +14,30 @@ import {
     TableContainer,
     TableHead,
     TableRow,
+    TextField,
     Typography,
 } from '@mui/material'
 import type { BookingTableProps } from '../../types/booking'
 import { formatBookingRange } from '../../utils/formatBookingRange'
 import { bookingStatusOptions, getBookingRoomLabel, getBookingUserLabel } from '../../utils/bookingList'
 
-export default function BookingTable({ items, onEdit, onDelete, onStatusChange, isLoading }: BookingTableProps) {
+export default function BookingTable({
+    items,
+    onEdit,
+    onDelete,
+    onStatusSelect,
+    onStatusConfirm,
+    onStatusDialogClose,
+    note,
+    onNoteChange,
+    pendingId,
+    pendingStatusId,
+    isLoading,
+}: BookingTableProps) {
     return (
-        <TableContainer component={Paper} elevation={0}>
-            <Table size="small">
+        <>
+            <TableContainer component={Paper} elevation={0}>
+                <Table size="small">
                 <TableHead>
                     <TableRow>
                         <TableCell>ID</TableCell>
@@ -43,7 +61,9 @@ export default function BookingTable({ items, onEdit, onDelete, onStatusChange, 
                                 <Select
                                     size="small"
                                     value={item.statusId}
-                                    onChange={(event) => onStatusChange(item.id, Number(event.target.value))}
+                                    onChange={(event) => {
+                                        onStatusSelect(item.id, Number(event.target.value))
+                                    }}
                                     disabled={isLoading}
                                 >
                                     {bookingStatusOptions.map((status) => (
@@ -86,7 +106,38 @@ export default function BookingTable({ items, onEdit, onDelete, onStatusChange, 
                         </TableRow>
                     ) : null}
                 </TableBody>
-            </Table>
-        </TableContainer>
+                </Table>
+            </TableContainer>
+
+            <Dialog
+                open={pendingId != null && pendingStatusId != null}
+                onClose={onStatusDialogClose}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Add status note</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        fullWidth
+                        label="Note"
+                        placeholder="Optional note for this status change"
+                        multiline
+                        minRows={3}
+                        margin="dense"
+                        value={note}
+                        onChange={(event) => onNoteChange(event.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onStatusDialogClose} disabled={isLoading}>
+                        Cancel
+                    </Button>
+                    <Button onClick={onStatusConfirm} variant="contained" disabled={isLoading}>
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     )
 }
