@@ -1,0 +1,10 @@
+:root {
+  --font-sans: 'Plus Jakarta Sans', 'Segoe UI', Tahoma, sans-serif;
+  --color-bg: #f7f3ef;
+  --color-surface: #ffffff;
+  --color-text: #1f2937;
+  --color-muted: #6b7280;
+  --color-brand: #0f4c5c;
+  --color-accent: #f0b429;
+  --shadow-soft: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
